@@ -2,13 +2,13 @@
 ESMCasDomainNet mode is available on huggingface.
 https://huggingface.co/wqiudao/ESMCasDomainNet_v0.1
 
-
+```
 conda create -n esm2 python=3.9  -y
 
 pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 pip install matplotlib
 pip install fair-esm 
-
+```
 
 
 
