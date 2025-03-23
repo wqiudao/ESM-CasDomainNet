@@ -1,4 +1,4 @@
-import torch,argparse,os,datetime
+import torch,argparse,os,datetime,re
 import torch.nn as nn
 from collections import defaultdict
 import torch.nn.functional as F
@@ -50,7 +50,7 @@ class ESM_MultiInput_MLP(nn.Module):
 
 		
 		_, _, tokenized_batch = self.batch_converter(original_batch)
-		tokenized_batch = tokenized_batch[:, 1:-1]  # del <cls> ºÍ <eos>
+		tokenized_batch = tokenized_batch[:, 1:-1]  # del <cls> 和 <eos>
 		tokenized_batch = tokenized_batch.to(device)
 
 		#   ESM  
@@ -72,6 +72,17 @@ def plot_multiple_protein_domains(data_list, output_prefix='protein_domain_diagr
 	total_plots = len(data_list)
 	if total_plots<plots_per_pdf:
 		plots_per_pdf=total_plots
+	
+	date2csv=open(f'{output_prefix}.csv','w')
+	date2fasta=open(f'{output_prefix}.fasta','w')
+	
+	seq_unique_set=set()
+	
+	date2csv.write('Sequence_ID,fasta_index,Sequence,Domain,Start,End,Domain_Length,Length,Reliability\n')
+	 
+	
+	# domain['info'] domain_data['name'] domain['seq']
+	
 	
 	num_pdfs = (total_plots + plots_per_pdf - 1) // plots_per_pdf
 	print(num_pdfs)
@@ -96,7 +107,14 @@ def plot_multiple_protein_domains(data_list, output_prefix='protein_domain_diagr
 					domain = domain_data['domain']
 					reliability = domain_data['reliability']
 					name = domain_data['name']
+					if domain_data['seq'] not in seq_unique_set:
+						seq_unique_set.add(domain_data['seq'])
+						date2fasta.write(f">{name}\n{domain_data['seq']}\n")
+						
 					color = colors.get(domain, 'gray')
+					# name2=re.sub(r"\s+", ",", name)
+					date2csv.write(f"{domain_data['info']}\n")
+					
 					ax.add_patch(patches.Rectangle((start, 0), end - start, body_height, color=color, alpha=reliability))
 					
 					label = f'{domain}: {start}, {end}, {reliability:.2f}'
@@ -117,7 +135,8 @@ def plot_multiple_protein_domains(data_list, output_prefix='protein_domain_diagr
 			plt.close(fig)
 
 
-
+	date2csv.close()
+	date2fasta.close()
 
 # def process_fasta(fasta_file):
     # # sequences = []
@@ -350,6 +369,8 @@ def write_domains_to_csv(sequences, output_file, model, domain_labels=["Non-stru
 		# for seq_id, seq in enumerate(sequences):
 		seq_id=0
 		data_lists=[]
+		data_lists2=[]
+		data_lists3=[]
 		for seq,f_id in sequences.items():
 			seq_id+=1
 			print(f"Processing sequence {seq_id}: {f_id[:30]}...")  # Print the first 30 characters as a preview
@@ -362,14 +383,26 @@ def write_domains_to_csv(sequences, output_file, model, domain_labels=["Non-stru
 				if domain['reliability']>=reliability:
 					domain['name']=f"seq_{seq_id} {f_id}"
 					domain['length']=len(seq)
-					f.write(f"seq_{seq_id},{f_id},{seq},{domain['domain']},{domain['start']},{domain['end']},{domain['length']},{domain['length']},{domain['reliability']}\n")
+					domain['seq']=seq
+					domain['info']=f"seq_{seq_id},{f_id},{seq},{domain['domain']},{domain['start']},{domain['end']},{domain['end']-domain['start']+1},{domain['length']},{domain['reliability']}"
+					f.write(f"{domain['info']}\n")
+	
 					data_list.append(domain)
 			if data_list:
 				data_lists.append(data_list)
+
+			if len(data_list)>1:
+				data_lists2.append(data_list)
+			if len(data_list)>2:
+				data_lists3.append(data_list)
+
+
 		# print(data_lists)
 	
 
-	plot_multiple_protein_domains(data_lists, output_pdf, plots_per_pdf=20)
+	plot_multiple_protein_domains(data_lists, f'{output_pdf}_ones_domain', plots_per_pdf=20)
+	plot_multiple_protein_domains(data_lists2, f'{output_pdf}_double_domain', plots_per_pdf=20)
+	plot_multiple_protein_domains(data_lists3, f'{output_pdf}_triple_domain', plots_per_pdf=20)
 
 
 def main():
@@ -389,7 +422,7 @@ def main():
 	# Process the sequences from the FASTA file
 	sequences = process_fasta(args.fasta_file)
 	# Output file name based on the input fasta file
-	current_time = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+	current_time = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
 	output_file = f'{os.path.splitext(args.fasta_file)[0]}_{current_time}_domains.csv'
 	
@@ -400,4 +433,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
