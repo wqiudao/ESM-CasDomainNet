@@ -340,7 +340,7 @@ def predict_and_get_domains(model, sequence, domain_labels=["Non-structural", "R
 def load_model(model_path, device='cpu'):
 	if not os.path.exists(model_path):
 		raise FileNotFoundError(f"Model file not found: {model_path}")
-	model = torch.load(model_path, map_location=device)
+	model = torch.load(model_path, map_location=device,weights_only=False)
 	return model
 
 def write_domains_to_csv(sequences, output_file, model, domain_labels=["Non-structural", "RUVC", "HNH", "HEPN"], device='cpu', min_domain_len=15, overlap=2, reliability=0.9,output_pdf="output_pdf"):
