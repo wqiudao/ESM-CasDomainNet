@@ -1,7 +1,7 @@
 # ESM-CasDomainNet
 ESMCasDomainNet mode is available on huggingface.
 https://huggingface.co/wqiudao/ESMCasDomainNet_v0.1
-
+GPU: CUDA-compatible GPU with more than 5GB VRAM
 ```
 conda create -n esm2 python=3.9  -y
 conda activate esm2 
