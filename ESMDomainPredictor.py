@@ -67,7 +67,7 @@ class ESM_MultiInput_MLP(nn.Module):
 		return predictions, max_seq_len
 
 
-def plot_multiple_protein_domains(data_list, output_prefix='protein_domain_diagram', plots_per_pdf=2,body_height=0.5):
+def plot_multiple_protein_domains(data_list, output_prefix='protein_domain_diagram', plots_per_pdf=2,body_height=0.5,domain_names = ['RUVC', 'HNH', 'HEPN']):
 
 	total_plots = len(data_list)
 	if total_plots<plots_per_pdf:
@@ -80,6 +80,13 @@ def plot_multiple_protein_domains(data_list, output_prefix='protein_domain_diagr
 	
 	date2csv.write('Sequence_ID,fasta_index,Sequence,Domain,Start,End,Domain_Length,Length,Reliability\n')
 	 
+	
+	colors = ["#76C893", "#4DD0E1", "#FFB4B4", "#D3D3D3", "#F4A261", "#A78BFA", "#B2DF8A", "#FDB462"]
+	
+	# domain_names = ['RUVC', 'HNH', 'HEPN']  # 可以任意多
+	
+	rcolors = {name.upper(): colors[i % len(colors)] for i, name in enumerate(domain_names)}
+
 	
 	# domain['info'] domain_data['name'] domain['seq']
 	
@@ -98,7 +105,7 @@ def plot_multiple_protein_domains(data_list, output_prefix='protein_domain_diagr
 				ax = axes[plot_idx]
 				total_length = data[0]['length']
 				ax.add_patch(patches.Rectangle((0, 0), total_length, body_height, color='lightgray'))
-				colors = {'RUVC': 'lightgreen', 'HNH': 'cyan', 'HEPN': 'lightblue'}
+				# colors = {'RUVC': 'lightgreen', 'HNH': 'cyan', 'HEPN': 'lightblue'}
 				patches_list = [] 
 				labels = []       
 				for domain_data in data:
@@ -111,7 +118,7 @@ def plot_multiple_protein_domains(data_list, output_prefix='protein_domain_diagr
 						seq_unique_set.add(domain_data['seq'])
 						date2fasta.write(f">{name}\n{domain_data['seq']}\n")
 						
-					color = colors.get(domain, 'gray')
+					color = rcolors.get(domain, 'gray')
 					# name2=re.sub(r"\s+", ",", name)
 					date2csv.write(f"{domain_data['info']}\n")
 					
@@ -400,9 +407,9 @@ def write_domains_to_csv(sequences, output_file, model, domain_labels=["Non-stru
 		# print(data_lists)
 	
 
-	plot_multiple_protein_domains(data_lists, f'{output_pdf}_ones_domain', plots_per_pdf=20)
-	plot_multiple_protein_domains(data_lists2, f'{output_pdf}_double_domain', plots_per_pdf=20)
-	plot_multiple_protein_domains(data_lists3, f'{output_pdf}_triple_domain', plots_per_pdf=20)
+	plot_multiple_protein_domains(data_lists, f'{output_pdf}_ones_domain', plots_per_pdf=20,domain_names=domain_labels[1:])
+	plot_multiple_protein_domains(data_lists2, f'{output_pdf}_double_domain', plots_per_pdf=20,domain_names=domain_labels[1:])
+	plot_multiple_protein_domains(data_lists3, f'{output_pdf}_triple_domain', plots_per_pdf=20,domain_names=domain_labels[1:])
 
 
 def main():
