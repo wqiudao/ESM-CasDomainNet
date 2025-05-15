@@ -7,6 +7,10 @@ GPU: CUDA-compatible GPU with more than 5GB VRAM
 conda create -n esm2 python=3.9  -y
 conda activate esm2 
 pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+
+# pip install torch==2.3.0 torchvision==0.18.0 torchaudio==2.3.0 --index-url https://download.pytorch.org/whl/cu121 
+
+
 pip install matplotlib
 pip install fair-esm 
 
