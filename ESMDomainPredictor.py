@@ -405,11 +405,12 @@ def write_domains_to_csv(sequences, output_file, model, domain_labels=["Non-stru
 
 
 		# print(data_lists)
-	
-
-	plot_multiple_protein_domains(data_lists, f'{output_pdf}_ones_domain', plots_per_pdf=20,domain_names=domain_labels[1:])
-	plot_multiple_protein_domains(data_lists2, f'{output_pdf}_double_domain', plots_per_pdf=20,domain_names=domain_labels[1:])
-	plot_multiple_protein_domains(data_lists3, f'{output_pdf}_triple_domain', plots_per_pdf=20,domain_names=domain_labels[1:])
+	if data_lists:
+		plot_multiple_protein_domains(data_lists, f'{output_pdf}_ones_domain', plots_per_pdf=20,domain_names=domain_labels[1:])
+	if data_lists2:	
+		plot_multiple_protein_domains(data_lists2, f'{output_pdf}_double_domain', plots_per_pdf=20,domain_names=domain_labels[1:])
+	if data_lists3:			
+		plot_multiple_protein_domains(data_lists3, f'{output_pdf}_triple_domain', plots_per_pdf=20,domain_names=domain_labels[1:])
 
 
 def main():
