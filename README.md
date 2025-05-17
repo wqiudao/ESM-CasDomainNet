@@ -20,3 +20,6 @@ pip install fair-esm
 
 
 python ESMDomainPredictor.py  --use_gpu   ESMCasDomainNet_v0.1.pth Cas9D.fa
+
+
+To facilitate broad access, we deployed ESMCasDomainNet as an interactive web server at www.esmdomain.com ,
